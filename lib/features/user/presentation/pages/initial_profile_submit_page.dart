@@ -1,11 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:whatsapp/features/app/const/page_const.dart';
+import 'package:whatsapp/features/user/domain/entities/user_entity.dart';
+import 'package:whatsapp/features/user/presentation/cubit/credential/credential_cubit.dart';
+import 'package:whatsapp/storage/storage_provider.dart';
 
 import '../../../app/const/app_const.dart';
 import '../../../app/global/widgets/profile_widget.dart';
 import '../../../app/theme/style.dart';
+import '../../../home/home_page.dart';
 import '../widgets/next_button.dart';
 
 class InitialProfileSubmitPage extends StatefulWidget {
@@ -24,6 +30,7 @@ class InitialProfileSubmitPage extends StatefulWidget {
 class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
   File? _image;
   final TextEditingController _usernameController = TextEditingController();
+  bool _isProfileUpdating = false;
 
   Future selectImage() async {
     try {
@@ -104,26 +111,81 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
                   hintStyle: TextStyle(color: textColor),
                   border: InputBorder.none,
                 ),
+                style: TextStyle(color: textColor),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
             NextButton(
-              onPressed: () {
-                /*Navigator.pushAndRemoveUntil(
+              onPressed: submitProfileInfo,
+              /*onPressed: () {
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const HomePage(),
                   ),
                   (route) => false,
-                );*/
-              },
+                );
+              },*/
               title: "Next",
             ),
           ],
         ),
       ),
     );
+  }
+
+  void submitProfileInfo() {
+    if (_image != null) {
+      StorageProviderRemoteDataSource.uploadProfileImage(
+          file: _image!,
+          onComplete: (onProfileUpdateComplete) {
+            setState(() {
+              _isProfileUpdating = onProfileUpdateComplete;
+            });
+          }).then((profileImageUrl) {
+        _profileInfo(
+          profileUrl: profileImageUrl,
+        );
+      });
+      /*Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(
+            uid: "1",
+          ),
+        ),
+        (route) => false,
+      );*/
+    } else {
+      _profileInfo(
+        profileUrl: "",
+      );
+      /*Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(
+            uid: "1",
+          ),
+        ),
+        (route) => false,
+      );*/
+    }
+  }
+
+  void _profileInfo({String? profileUrl}) {
+    if (_usernameController.text.isNotEmpty) {
+      BlocProvider.of<CredentialCubit>(context).submitProfileInfo(
+        user: UserEntity(
+          email: "",
+          username: _usernameController.text,
+          phoneNumber: widget.phoneNumber,
+          status: "Hey There! I'm using WhatsApp",
+          isOnline: false,
+          profileUrl: profileUrl,
+        ),
+      );
+    }
   }
 }

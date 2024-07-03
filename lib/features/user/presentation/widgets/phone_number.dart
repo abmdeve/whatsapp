@@ -57,7 +57,9 @@ class PhoneNumber extends StatelessWidget {
                 fillColor: Colors.orange,
                 focusColor: Colors.orange,
                 border: InputBorder.none,
+
               ),
+              style: TextStyle(color: textColor),
             ),
           ),
         ),

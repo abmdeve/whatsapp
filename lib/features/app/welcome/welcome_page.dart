@@ -21,6 +21,7 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
             Image.asset("assets/bg_image.png"),
+
             Column(
               children: [
                 const Text(

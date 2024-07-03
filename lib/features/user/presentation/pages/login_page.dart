@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context, credentialBuilderState) {
         if (credentialBuilderState is CredentialLoading) {
           return const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(color: tabColor,),
           );
         }
 
