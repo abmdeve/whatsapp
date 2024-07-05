@@ -1,3 +1,4 @@
+import 'package:whatsapp/features/user/domain/usecases/user/get_device_number_use_case.dart';
 import 'package:whatsapp/features/user/presentation/cubit/auth/auth_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/credential/credential_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/get_device_number/get_device_number_cubit.dart';
@@ -91,6 +92,12 @@ Future<void> userInjectionContainer() async {
 
   sl.registerLazySingleton<VerifyPhoneNumberUseCase>(
     () => VerifyPhoneNumberUseCase(
+      repository: sl.call(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetDeviceNumberUseCase>(
+    () => GetDeviceNumberUseCase(
       repository: sl.call(),
     ),
   );

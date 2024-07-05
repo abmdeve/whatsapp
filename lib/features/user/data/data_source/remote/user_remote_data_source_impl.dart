@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contacts_service/contacts_service.dart';
+//import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:whatsapp/features/user/data/data_source/remote/user_remote_data_source.dart';
 
@@ -62,20 +61,22 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   Future<List<ContactEntity>> getDeviceNumber() async {
     List<ContactEntity> contactsList = [];
 
-    /*if(await FlutterContacts.requestPermission()) {
+    if (await FlutterContacts.requestPermission()) {
       List<Contact> contacts = await FlutterContacts.getContacts(
-          withProperties: true, withPhoto: true);
+        withProperties: true,
+        withPhoto: true,
+      );
 
       for (var contact in contacts) {
         contactsList.add(
-            ContactEntity(
-                name: contact.name,
-                photo: contact.photo,
-                phones: contact.phones
-            )
+          ContactEntity(
+            name: contact.name,
+            photo: contact.photo,
+            phones: contact.phones,
+          ),
         );
       }
-    }*/
+    }
 
     return contactsList;
   }
