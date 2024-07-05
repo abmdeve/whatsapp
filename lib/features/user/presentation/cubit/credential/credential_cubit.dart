@@ -43,7 +43,6 @@ class CredentialCubit extends Cubit<CredentialState> {
   }
 
   Future<void> submitProfileInfo({required UserEntity user}) async {
-
     try {
       await createUserUseCase.call(user);
       emit(CredentialSuccess());

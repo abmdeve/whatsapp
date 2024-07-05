@@ -22,14 +22,14 @@ Future<void> userInjectionContainer() async {
   //TODO: * CUBITS INJECTION
 
   sl.registerFactory<AuthCubit>(() => AuthCubit(
-    getCurrentUidUseCase: sl.call(),
-    isSignInUseCase: sl.call(),
-    signOutUseCase: sl.call(),
-  ));
+        getCurrentUidUseCase: sl.call(),
+        isSignInUseCase: sl.call(),
+        signOutUseCase: sl.call(),
+      ));
 
   sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
-    getSingleUserUseCase: sl.call(),
-  ));
+        getSingleUserUseCase: sl.call(),
+      ));
 
   sl.registerFactory<CredentialCubit>(() => CredentialCubit(
       signInWithPhoneNumberUseCase: sl.call(),
@@ -37,60 +37,60 @@ Future<void> userInjectionContainer() async {
       createUserUseCase: sl.call()));
 
   sl.registerFactory<GetDeviceNumberCubit>(() => GetDeviceNumberCubit(
-    getDeviceNumberUseCase: sl.call(),
-  ));
+        getDeviceNumberUseCase: sl.call(),
+      ));
 
   //TODO: * USE CASES INJECTION
 
   sl.registerLazySingleton<GetCurrentUidUseCase>(
-        () => GetCurrentUidUseCase(
+    () => GetCurrentUidUseCase(
       repository: sl.call(),
     ),
   );
   sl.registerLazySingleton<IsSignInUseCase>(
-        () => IsSignInUseCase(
+    () => IsSignInUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<SignOutUseCase>(
-        () => SignOutUseCase(
+    () => SignOutUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<CreateUserUseCase>(
-        () => CreateUserUseCase(
+    () => CreateUserUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<GetAllUsersUseCase>(
-        () => GetAllUsersUseCase(
+    () => GetAllUsersUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<UpdateUserUseCase>(
-        () => UpdateUserUseCase(
+    () => UpdateUserUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<GetSingleUserUseCase>(
-        () => GetSingleUserUseCase(
+    () => GetSingleUserUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<SignInWithPhoneNumberUseCase>(
-        () => SignInWithPhoneNumberUseCase(
+    () => SignInWithPhoneNumberUseCase(
       repository: sl.call(),
     ),
   );
 
   sl.registerLazySingleton<VerifyPhoneNumberUseCase>(
-        () => VerifyPhoneNumberUseCase(
+    () => VerifyPhoneNumberUseCase(
       repository: sl.call(),
     ),
   );
@@ -98,14 +98,13 @@ Future<void> userInjectionContainer() async {
   //TODO: * REPOSITORY & DATA SOURCES INJECTION
 
   sl.registerLazySingleton<UserRepository>(
-        () => UserRepositoryImpl(
+    () => UserRepositoryImpl(
       remoteDataSource: sl.call(),
     ),
   );
-  sl.registerLazySingleton<UserRemoteDataSource>(
-        () => UserRemoteDataSourceImpl(
-      auth: sl.call(),
-      firestore: sl.call(),
-    ),
-  );
+
+  sl.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(
+        auth: sl.call(),
+        fireStore: sl.call(),
+      ));
 }

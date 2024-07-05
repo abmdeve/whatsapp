@@ -129,6 +129,7 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
                 );
               },*/
               title: "Next",
+              isLoading: false,
             ),
           ],
         ),
@@ -162,7 +163,7 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
       _profileInfo(
         profileUrl: "",
       );
-      /*Navigator.pushAndRemoveUntil(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
           builder: (context) => const HomePage(
@@ -170,12 +171,14 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
           ),
         ),
         (route) => false,
-      );*/
+      );
     }
   }
 
   void _profileInfo({String? profileUrl}) {
     if (_usernameController.text.isNotEmpty) {
+      debugPrint(
+          "USER LOGIN WITH NUMBER PHONE ------------> ${_usernameController.text} <-------<<${widget.phoneNumber}>>>>-----");
       BlocProvider.of<CredentialCubit>(context).submitProfileInfo(
         user: UserEntity(
           email: "",

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:whatsapp/features/user/data/data_source/remote/user_remote_data_source.dart';
 
 import '../../../../app/const/app_const.dart';
@@ -11,32 +12,28 @@ import '../../../domain/entities/user_entity.dart';
 import '../../models/user_model.dart';
 
 class UserRemoteDataSourceImpl implements UserRemoteDataSource {
-  final FirebaseFirestore firestore;
+  final FirebaseFirestore fireStore;
   final FirebaseAuth auth;
 
-  UserRemoteDataSourceImpl({
-    required this.firestore,
-    required this.auth,
-  });
+  UserRemoteDataSourceImpl({required this.fireStore, required this.auth});
 
   String _verificationId = "";
 
   @override
   Future<void> createUser(UserEntity user) async {
-    // TODO: implement createUser
-    final userCollection = firestore.collection(FirebaseCollectionConst.users);
+    final userCollection = fireStore.collection(FirebaseCollectionConst.users);
 
     final uid = await getCurrentUID();
 
     final newUser = UserModel(
-      email: user.email,
-      uid: user.uid,
-      isOnline: user.isOnline,
-      phoneNumber: user.phoneNumber,
-      username: user.username,
-      profileUrl: user.profileUrl,
-      status: user.status,
-    ).toDocument();
+            email: user.email,
+            uid: uid,
+            isOnline: user.isOnline,
+            phoneNumber: user.phoneNumber,
+            username: user.username,
+            profileUrl: user.profileUrl,
+            status: user.status)
+        .toDocument();
 
     try {
       userCollection.doc(uid).get().then((userDoc) {
@@ -47,15 +44,13 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
         }
       });
     } catch (e) {
-      throw Exception("ERROR OCCUR WHILE CREATING USER");
+      throw Exception("Error occur while creating user");
     }
   }
 
   @override
   Stream<List<UserEntity>> getAllUsers() {
-    // TODO: implement getAllUsers
-    final userCollection = firestore.collection(FirebaseCollectionConst.users);
-
+    final userCollection = fireStore.collection(FirebaseCollectionConst.users);
     return userCollection.snapshots().map((querySnapshot) =>
         querySnapshot.docs.map((e) => UserModel.fromSnapshot(e)).toList());
   }
@@ -65,30 +60,31 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<List<ContactEntity>> getDeviceNumber() async {
-    // TODO: implement getDeviceNumber
-    List<ContactEntity> contacts = [];
+    List<ContactEntity> contactsList = [];
 
-    final getContactsData = await ContactsService.getContacts();
-    getContactsData.forEach((myContact) {
-      myContact.phones!.forEach((phoneData) {
-        contacts.add(ContactEntity(
-          phoneNumber: phoneData.value,
-          label: myContact.displayName,
-          userProfile: myContact.avatar as String,
-        ));
-      });
-    });
+    /*if(await FlutterContacts.requestPermission()) {
+      List<Contact> contacts = await FlutterContacts.getContacts(
+          withProperties: true, withPhoto: true);
 
-    return contacts;
+      for (var contact in contacts) {
+        contactsList.add(
+            ContactEntity(
+                name: contact.name,
+                photo: contact.photo,
+                phones: contact.phones
+            )
+        );
+      }
+    }*/
+
+    return contactsList;
   }
 
   @override
   Stream<List<UserEntity>> getSingleUser(String uid) {
-    // TODO: implement getSingleUser
-    final userCollection = firestore
+    final userCollection = fireStore
         .collection(FirebaseCollectionConst.users)
         .where("uid", isEqualTo: uid);
-
     return userCollection.snapshots().map((querySnapshot) =>
         querySnapshot.docs.map((e) => UserModel.fromSnapshot(e)).toList());
   }
@@ -98,24 +94,19 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<void> signInWithPhoneNumber(String smsPinCode) async {
-    // TODO: implement signInWithPhoneNumber
-    try{
-      final AuthCredential credential = PhoneAuthProvider
-          .credential(
-        verificationId: smsPinCode,
-        smsCode: _verificationId,
-      );
+    try {
+      final AuthCredential credential = PhoneAuthProvider.credential(
+          smsCode: smsPinCode, verificationId: _verificationId);
 
       await auth.signInWithCredential(credential);
-
-    }on FirebaseAuthException catch(e) {
-      if(e.code == 'invalid-verification-code'){
-        toast("SMS VERIFICATION CODE");
-      }else if(e.code == "quota-exceeded"){
-        toast("SMS QUOTA-EXCEEDED");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        toast("Invalid Verification Code");
+      } else if (e.code == 'quota-exceeded') {
+        toast("SMS quota-exceeded");
       }
-    }catch (e) {
-      toast("UNKNOWN EXCEPTION PLEASE TRY AGAIN");
+    } catch (e) {
+      toast("Unknown exception please try again");
     }
   }
 
@@ -124,13 +115,14 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<void> updateUser(UserEntity user) async {
-    // TODO: implement updateUser
-    final userCollection = firestore.collection(FirebaseCollectionConst.users);
+    final userCollection = fireStore.collection(FirebaseCollectionConst.users);
 
     Map<String, dynamic> userInfo = {};
 
     if (user.username != "" && user.username != null)
       userInfo['username'] = user.username;
+    if (user.status != "" && user.status != null)
+      userInfo['status'] = user.status;
 
     if (user.profileUrl != "" && user.profileUrl != null)
       userInfo['profileUrl'] = user.profileUrl;
@@ -142,26 +134,24 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
 
   @override
   Future<void> verifyPhoneNumber(String phoneNumber) async {
-    // TODO: implement verifyPhoneNumber
     phoneVerificationCompleted(AuthCredential authCredential) {
-      debugPrint(
-          "PHONE VERIFIED: TOKEN ${authCredential.token} ${authCredential.signInMethod}");
+      print(
+          "phone verified : Token ${authCredential.token} ${authCredential.signInMethod}");
     }
 
     phoneVerificationFailed(FirebaseAuthException firebaseAuthException) {
-      debugPrint(
-          "PHONE FAILED: ${firebaseAuthException.message} ${firebaseAuthException.code}");
+      print(
+        "phone failed : ${firebaseAuthException.message},${firebaseAuthException.code}",
+      );
     }
 
     phoneCodeAutoRetrievalTimeout(String verificationId) {
       _verificationId = verificationId;
-      debugPrint("TIME OUT: $verificationId");
+      print("time out :$verificationId");
     }
 
-    phoneCodeSend(String verificationId, int? forceResendToken) {
+    phoneCodeSent(String verificationId, int? forceResendingToken) {
       _verificationId = verificationId;
-
-      debugPrint("PHONE FAILED");
     }
 
     await auth.verifyPhoneNumber(
@@ -169,7 +159,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       verificationCompleted: phoneVerificationCompleted,
       verificationFailed: phoneVerificationFailed,
       timeout: const Duration(seconds: 60),
-      codeSent: phoneCodeSend,
+      codeSent: phoneCodeSent,
       codeAutoRetrievalTimeout: phoneCodeAutoRetrievalTimeout,
     );
   }

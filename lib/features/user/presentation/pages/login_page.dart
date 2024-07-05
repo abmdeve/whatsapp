@@ -123,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
 
             //TODO NEXT BUTTON FOR NAVIGATE TO OTP SCREEN
             NextButton(
+              isLoading: false,
               onPressed: _submitVerifyPhoneNumber,
               /*onPressed: () {
                 Navigator.push(context,
@@ -205,12 +206,12 @@ class _LoginPageState extends State<LoginPage> {
   void _submitVerifyPhoneNumber() {
     if (_phoneController.text.isNotEmpty) {
       _phoneNumber = "+$_countryCode${_phoneController.text}";
-      debugPrint("PHONE NUMBER $_phoneNumber");
+      debugPrint("PHONE NUMBER ========================== $_phoneNumber");
       BlocProvider.of<CredentialCubit>(context).submitVerifyPhoneNumber(
         phoneNumber: _phoneNumber,
       );
     } else {
-      toast("ENTER YOUR PHONE NUMBER");
+      toast("ENTER YOUR PHONE NUMBER 1111");
     }
   }
 }

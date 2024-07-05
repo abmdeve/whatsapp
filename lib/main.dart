@@ -52,6 +52,10 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData().copyWith(
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: tabColor,
+              brightness: Brightness.dark,
+          ),
           scaffoldBackgroundColor: backgroundColor,
           dialogBackgroundColor: appBarColor,
           appBarTheme: const AppBarTheme(

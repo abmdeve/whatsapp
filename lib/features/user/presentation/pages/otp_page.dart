@@ -67,6 +67,7 @@ class _OtpPageState extends State<OtpPage> {
               ),
             ),
             NextButton(
+              isLoading: false,
               onPressed: _submitSmsCode,
               /*onPressed: () {
                 Navigator.push(
@@ -88,6 +89,7 @@ class _OtpPageState extends State<OtpPage> {
   void _submitSmsCode() {
     debugPrint("OTP CODE ${_otpController.text}");
     if (_otpController.text.isNotEmpty) {
+      debugPrint("PHONE NUMBER ========================== ${_otpController.text}");
       BlocProvider.of<CredentialCubit>(context)
           .submitSmsCode(smsCode: _otpController.text,
       );

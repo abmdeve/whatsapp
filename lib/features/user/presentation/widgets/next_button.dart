@@ -5,11 +5,15 @@ import '../../../app/theme/style.dart';
 class NextButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String title;
+  final Widget? child;
+  final bool? isLoading;
 
   const NextButton({
     super.key,
     required this.onPressed,
     required this.title,
+    this.child,
+    required this.isLoading,
   });
 
   @override
@@ -25,15 +29,22 @@ class NextButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
         ),
         child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: whiteColor,
-              fontSize: 15,
-              fontWeight:
-              FontWeight.w500,
-            ),
-          ),
+          child: isLoading == true
+              ? SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: CircularProgressIndicator(
+                    color: whiteColor,
+                  ),
+                )
+              : Text(
+                  title,
+                  style: const TextStyle(
+                    color: whiteColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
         ),
       ),
     );

@@ -14,6 +14,7 @@ class UserIconPositioned extends StatelessWidget {
   final Widget? iconPositioned;
   final Color? backgroundColor;
   final Color transparentColorOrNot;
+  final VoidCallback? onTap;
 
   const UserIconPositioned({
     super.key,
@@ -25,57 +26,64 @@ class UserIconPositioned extends StatelessWidget {
     required this.title,
     required this.subTitle,
     required this.trailing,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              UserImage(imageUrl: imageUrl, image: image,),
-              Positioned(
-                right: 10,
-                bottom: 8,
-                child: Container(
-                  width: 25,
-                  height: 25,
-                  decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        width: 2,
-                        color: transparentColorOrNot,
-                      )),
-                  child: Center(
-                    child: iconPositioned,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Row(
+          children: [
+            Stack(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 16, color: textColor),
+                UserImage(
+                  imageUrl: imageUrl,
+                  image: image,
                 ),
-                const SizedBox(
-                  height: 2,
-                ),
-                Text(
-                  subTitle,
-                  style: const TextStyle(color: greyColor),
+                Positioned(
+                  right: 10,
+                  bottom: 8,
+                  child: Container(
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                        color: backgroundColor,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          width: 2,
+                          color: transparentColorOrNot,
+                        )),
+                    child: Center(
+                      child: iconPositioned,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          trailing,
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 16, color: textColor),
+                  ),
+                  const SizedBox(
+                    height: 2,
+                  ),
+                  Text(
+                    subTitle,
+                    style: const TextStyle(color: greyColor),
+                  ),
+                ],
+              ),
+            ),
+            trailing,
+          ],
+        ),
       ),
     );
   }

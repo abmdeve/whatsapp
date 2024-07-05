@@ -21,6 +21,12 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
             Image.asset("assets/bg_image.png"),
+            /*Image.asset(
+              "assets/bg_image.png",
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),*/
 
             Column(
               children: [
