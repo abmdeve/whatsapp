@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp/features/app/const/page_const.dart';
 import 'package:whatsapp/features/app/global/widgets/dialog_widget.dart';
 import 'package:whatsapp/features/user/domain/entities/user_entity.dart';
+import 'package:whatsapp/features/user/presentation/cubit/auth/auth_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/get_single_user/get_single_user_state.dart';
 
@@ -130,7 +131,14 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () {
               displayAlertDialog(
                 context,
-                onTap: () {},
+                onTap: () {
+                  BlocProvider.of<AuthCubit>(context).loggedOut();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    PageConst.welcomePage,
+                    (route) => false,
+                  );
+                },
                 confirmTitle: "Logout",
                 content: "Are you sure you want to logout ?",
               );

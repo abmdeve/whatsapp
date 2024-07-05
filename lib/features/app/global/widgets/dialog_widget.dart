@@ -27,7 +27,7 @@ displayAlertDialog(
 
   AlertDialog alert = AlertDialog(
     backgroundColor: backgroundColor,
-    content: Text(content),
+    content: Text(content, style: TextStyle(color: textColor),),
     actions: [cancelButton, deleteButton],
   );
 
