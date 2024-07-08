@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:whatsapp/features/chat/presentation/cubit/chat/chat_cubit.dart';
+import 'package:whatsapp/features/chat/presentation/cubit/message/message_cubit.dart';
 import 'package:whatsapp/features/home/home_page.dart';
 import 'package:whatsapp/features/user/presentation/cubit/auth/auth_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/auth/auth_state.dart';
@@ -47,14 +49,20 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => di.sl<GetDeviceNumberCubit>(),
         ),
+        BlocProvider(
+          create: (context) => di.sl<ChatCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => di.sl<MessageCubit>(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData().copyWith(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: tabColor,
-              brightness: Brightness.dark,
+            seedColor: tabColor,
+            brightness: Brightness.dark,
           ),
           scaffoldBackgroundColor: backgroundColor,
           dialogBackgroundColor: appBarColor,
