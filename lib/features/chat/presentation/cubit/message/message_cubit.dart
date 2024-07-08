@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:whatsapp/features/chat/domain/entities/chat_entity.dart';
 import 'package:whatsapp/features/chat/domain/entities/message_entity.dart';
 import 'package:whatsapp/features/chat/domain/usecases/get_messages_usecase.dart';
 
@@ -38,6 +39,17 @@ class MessageCubit extends Cubit<MessageState> {
   Future<void> deleteMessage({required MessageEntity message}) async {
     try {
       await deleteMessageUseCase.call(message);
+    } on SocketException {
+      emit(MessageFailure());
+    } catch (_) {
+      emit(MessageFailure());
+    }
+  }
+
+  Future<void> sendMessage(
+      {required ChatEntity chat, required MessageEntity message}) async {
+    try {
+      await sendMessageUseCase.call(chat, message);
     } on SocketException {
       emit(MessageFailure());
     } catch (_) {
