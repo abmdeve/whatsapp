@@ -4,7 +4,7 @@ import 'package:whatsapp/features/user/presentation/pages/edit_profile_page.dart
 
 import '../features/app/const/page_const.dart';
 import '../features/call/presentation/pages/call_contacts_page.dart';
-import '../features/chat/pages/single_chat_page.dart';
+import '../features/chat/presentation/pages/single_chat_page.dart';
 import '../features/home/contacts_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/status/presentation/pages/my_status_page.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/const/page_const.dart';
 import '../app/theme/style.dart';
 import '../call/presentation/pages/call_history_page.dart';
-import '../chat/pages/chat_page.dart';
+import '../chat/presentation/pages/chat_page.dart';
 import '../status/presentation/pages/status_page.dart';
 
 class HomePage extends StatefulWidget {

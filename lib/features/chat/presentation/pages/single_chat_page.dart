@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../app/global/widgets/attach_window_item.dart';
-import '../../app/global/widgets/bacgroung_image_widget.dart';
-import '../../app/global/widgets/input_single_chat.dart';
-import '../../app/global/widgets/message_layout.dart';
-import '../../app/global/widgets/user_image.dart';
-import '../../app/theme/style.dart';
+import '../../../app/global/widgets/attach_window_item.dart';
+import '../../../app/global/widgets/bacgroung_image_widget.dart';
+import '../../../app/global/widgets/input_single_chat.dart';
+import '../../../app/global/widgets/message_layout.dart';
+import '../../../app/global/widgets/user_image.dart';
+import '../../../app/theme/style.dart';
 
 class SingleChatPage extends StatefulWidget {
   const SingleChatPage({super.key});

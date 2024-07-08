@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../app/const/page_const.dart';
-import '../../app/global/widgets/list_tile_content.dart';
-import '../../app/theme/style.dart';
+import '../../../app/const/page_const.dart';
+import '../../../app/global/widgets/list_tile_content.dart';
+import '../../../app/theme/style.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
