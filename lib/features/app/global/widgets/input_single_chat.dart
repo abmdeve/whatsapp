@@ -11,6 +11,7 @@ class InputSingleChat extends StatelessWidget {
   final VoidCallback? onCameraClicked;
   final VoidCallback? onEmojiClicked;
   final VoidCallback? onTap;
+  final VoidCallback? onSendMessage;
 
   const InputSingleChat({
     super.key,
@@ -21,6 +22,7 @@ class InputSingleChat extends StatelessWidget {
     this.onCameraClicked,
     this.onEmojiClicked,
     this.onTap,
+    this.onSendMessage,
   });
 
   @override
@@ -44,6 +46,7 @@ class InputSingleChat extends StatelessWidget {
               ),
               height: 50,
               child: TextField(
+                style: TextStyle(color: textColor),
                 onTap: onTap,
                 controller: textMessageController,
                 onChanged: onChanged,
@@ -91,19 +94,22 @@ class InputSingleChat extends StatelessWidget {
           ),
           const SizedBox(width: 10.0,),
           //TODO BUTTON SEND MESSAGE
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: tabColor,
-            ),
-            child: Center(
-              child: Icon(
-                isDisplaySendButton ?
-                Icons.send_outlined
-                    : Icons.mic,
-                color: textColor,
+          GestureDetector(
+            onTap: onSendMessage,
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: tabColor,
+              ),
+              child: Center(
+                child: Icon(
+                  isDisplaySendButton ?
+                  Icons.send_outlined
+                      : Icons.mic,
+                  color: textColor,
+                ),
               ),
             ),
           ),

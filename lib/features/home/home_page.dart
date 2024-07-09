@@ -144,8 +144,8 @@ class _HomePageState extends State<HomePage>
           switchFloatingActionButtonOnTabIndex(_currentTabIndex),
       body: TabBarView(
         controller: _tabController,
-        children: const [
-          ChatPage(),
+        children: [
+          ChatPage(uid: widget.uid,),
           StatusPage(),
           CallHistoryPage(),
         ],
@@ -160,7 +160,8 @@ class _HomePageState extends State<HomePage>
           return FloatingActionButton(
             backgroundColor: tabColor,
             onPressed: () {
-              Navigator.pushNamed(context, PageConst.contactUsersPage);
+              Navigator.pushNamed(context, PageConst.contactUsersPage,
+                  arguments: widget.uid);
             },
             child: const Icon(
               Icons.message,

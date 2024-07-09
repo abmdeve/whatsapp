@@ -14,6 +14,9 @@ Future<void> init() async {
   sl.registerLazySingleton(() => auth);
   sl.registerLazySingleton(() => fireStore);
 
+  /* await userInjectionContainer();
+  await chatInjectionContainer(); */
+
   await userInjectionContainer();
   await chatInjectionContainer();
 

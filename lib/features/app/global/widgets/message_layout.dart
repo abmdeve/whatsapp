@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -8,8 +9,8 @@ import '../../theme/style.dart';
 class MessageLayout extends StatelessWidget {
   final Color? messageColor;
   final Alignment? alignment;
-  final DateTime? createAt;
-  //final Timestamp? createAt;
+  //final DateTime? createAt;
+  final Timestamp? createAt;
   final Function(DragUpdateDetails)? onSwipe;
   //final double? rightPadding;
   final String? message;
@@ -76,8 +77,8 @@ class MessageLayout extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        DateFormat.jm().format(createAt!),
-                        //DateFormat.jm().format(createAt!.toDate()),
+                        //DateFormat.jm().format(createAt!),
+                        DateFormat.jm().format(createAt!.toDate()),
                         style: const TextStyle(
                           fontSize: 12,
                           color: lightGreyColor,

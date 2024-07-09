@@ -3,6 +3,7 @@ import 'package:whatsapp/features/user/presentation/cubit/auth/auth_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/credential/credential_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/get_device_number/get_device_number_cubit.dart';
 import 'package:whatsapp/features/user/presentation/cubit/get_single_user/get_single_user_cubit.dart';
+import 'package:whatsapp/features/user/presentation/cubit/user/user_cubit.dart';
 
 import '../../main_injection_container.dart';
 import 'data/data_source/remote/user_remote_data_source.dart';
@@ -23,92 +24,59 @@ Future<void> userInjectionContainer() async {
   //TODO: * CUBITS INJECTION
 
   sl.registerFactory<AuthCubit>(() => AuthCubit(
-        getCurrentUidUseCase: sl.call(),
-        isSignInUseCase: sl.call(),
-        signOutUseCase: sl.call(),
-      ));
+      getCurrentUidUseCase: sl.call(),
+      isSignInUseCase: sl.call(),
+      signOutUseCase: sl.call()));
 
-  sl.registerFactory<GetSingleUserCubit>(() => GetSingleUserCubit(
-        getSingleUserUseCase: sl.call(),
-      ));
+  sl.registerFactory<UserCubit>(() =>
+      UserCubit(getAllUsersUseCase: sl.call(), updateUserUseCase: sl.call()));
+
+  sl.registerFactory<GetSingleUserCubit>(
+      () => GetSingleUserCubit(getSingleUserUseCase: sl.call()));
 
   sl.registerFactory<CredentialCubit>(() => CredentialCubit(
+      createUserUseCase: sl.call(),
       signInWithPhoneNumberUseCase: sl.call(),
-      verifyPhoneNumberUseCase: sl.call(),
-      createUserUseCase: sl.call()));
+      verifyPhoneNumberUseCase: sl.call()));
 
-  sl.registerFactory<GetDeviceNumberCubit>(() => GetDeviceNumberCubit(
-        getDeviceNumberUseCase: sl.call(),
-      ));
+  sl.registerFactory<GetDeviceNumberCubit>(
+      () => GetDeviceNumberCubit(getDeviceNumberUseCase: sl.call()));
 
   //TODO: * USE CASES INJECTION
 
   sl.registerLazySingleton<GetCurrentUidUseCase>(
-    () => GetCurrentUidUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => GetCurrentUidUseCase(repository: sl.call()));
+
   sl.registerLazySingleton<IsSignInUseCase>(
-    () => IsSignInUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => IsSignInUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<SignOutUseCase>(
-    () => SignOutUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => SignOutUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<CreateUserUseCase>(
-    () => CreateUserUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => CreateUserUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<GetAllUsersUseCase>(
-    () => GetAllUsersUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => GetAllUsersUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<UpdateUserUseCase>(
-    () => UpdateUserUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => UpdateUserUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<GetSingleUserUseCase>(
-    () => GetSingleUserUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => GetSingleUserUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<SignInWithPhoneNumberUseCase>(
-    () => SignInWithPhoneNumberUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => SignInWithPhoneNumberUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<VerifyPhoneNumberUseCase>(
-    () => VerifyPhoneNumberUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => VerifyPhoneNumberUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<GetDeviceNumberUseCase>(
-    () => GetDeviceNumberUseCase(
-      repository: sl.call(),
-    ),
-  );
+      () => GetDeviceNumberUseCase(repository: sl.call()));
 
   //TODO: * REPOSITORY & DATA SOURCES INJECTION
-
   sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(
-      remoteDataSource: sl.call(),
-    ),
-  );
+      () => UserRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl(
         auth: sl.call(),

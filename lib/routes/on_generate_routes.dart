@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whatsapp/features/chat/domain/entities/message_entity.dart';
 import 'package:whatsapp/features/user/domain/entities/user_entity.dart';
 import 'package:whatsapp/features/user/presentation/pages/edit_profile_page.dart';
 
@@ -17,7 +18,13 @@ class OnGenerateRoutes {
     switch (name) {
       case PageConst.contactUsersPage:
         {
-          return materialPageBuilder(const ContactsPage());
+          if (args is String) {
+            return materialPageBuilder(ContactsPage(
+              uid: args,
+            ));
+          } else {
+            return materialPageBuilder(const ErrorPage());
+          }
         }
       case PageConst.settingsPage:
         {
@@ -50,7 +57,13 @@ class OnGenerateRoutes {
 
       case PageConst.singleChatPage:
         {
-          return materialPageBuilder(const SingleChatPage());
+          if (args is MessageEntity) {
+            return materialPageBuilder(SingleChatPage(
+              message: args,
+            ));
+          } else {
+            return materialPageBuilder(const ErrorPage());
+          }
         }
     }
   }
