@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../theme/style.dart';
 
-
 class InputSingleChat extends StatelessWidget {
   final TextEditingController textMessageController;
   final bool isDisplaySendButton;
+  final bool isRecording;
   final Function(String) onChanged;
   final VoidCallback? onAttachedFileClicked;
   final VoidCallback? onCameraClicked;
@@ -17,6 +17,7 @@ class InputSingleChat extends StatelessWidget {
     super.key,
     required this.textMessageController,
     required this.isDisplaySendButton,
+    required this.isRecording,
     required this.onChanged,
     this.onAttachedFileClicked,
     this.onCameraClicked,
@@ -73,7 +74,9 @@ class InputSingleChat extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 15,),
+                        const SizedBox(
+                          width: 15,
+                        ),
                         GestureDetector(
                           onTap: onCameraClicked,
                           child: const Icon(
@@ -81,7 +84,9 @@ class InputSingleChat extends StatelessWidget {
                             color: greyColor,
                           ),
                         ),
-                        const SizedBox(width: 15,),
+                        const SizedBox(
+                          width: 15,
+                        ),
                       ],
                     ),
                   ),
@@ -92,7 +97,9 @@ class InputSingleChat extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 10.0,),
+          const SizedBox(
+            width: 10.0,
+          ),
           //TODO BUTTON SEND MESSAGE
           GestureDetector(
             onTap: onSendMessage,
@@ -105,9 +112,11 @@ class InputSingleChat extends StatelessWidget {
               ),
               child: Center(
                 child: Icon(
-                  isDisplaySendButton ?
-                  Icons.send_outlined
-                      : Icons.mic,
+                  isDisplaySendButton
+                      ? Icons.send_outlined
+                      : isRecording
+                          ? Icons.close
+                          : Icons.mic,
                   color: textColor,
                 ),
               ),

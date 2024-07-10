@@ -6,6 +6,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>NSContactsUsageDescription</key>
     <string>Reason we need access to the contact list</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to the microphone to record audio.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Whatsapp</string>
 	<key>CFBundleExecutable</key>

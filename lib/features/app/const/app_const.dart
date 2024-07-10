@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 
 import '../theme/style.dart';
-
 
 void toast(String message) {
   Fluttertoast.showToast(
@@ -13,4 +14,19 @@ void toast(String message) {
     textColor: whiteColor,
     fontSize: 16.0,
   );
+}
+
+Future<GiphyGif?> pickGIF(BuildContext context) async {
+  GiphyGif? gif;
+
+  try {
+    gif = await GiphyPicker.pickGif(
+      context: context,
+      apiKey: 'kLu4PIKAw52ys47Ji7oWUIr2iZbEoj1k',
+      //apiKey: 's7eSt9XkwB0CqHMSKSA5TeeBRUfJBczH',
+    );
+  } catch (e) {
+    toast(e.toString());
+  }
+  return gif;
 }

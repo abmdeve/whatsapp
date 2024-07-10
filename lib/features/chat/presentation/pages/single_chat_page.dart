@@ -1,12 +1,26 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+//import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:whatsapp/features/app/const/message_type_const.dart';
+import 'package:whatsapp/features/app/global/widgets/show_image_picked_widget.dart';
+import 'package:whatsapp/features/app/global/widgets/show_video_picked_widget.dart';
 import 'package:whatsapp/features/chat/domain/entities/chat_entity.dart';
 import 'package:whatsapp/features/chat/domain/entities/message_entity.dart';
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_cubit.dart';
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_state.dart';
+import 'package:whatsapp/features/chat/presentation/widget/chat_utils.dart';
+import 'package:whatsapp/storage/storage_provider.dart';
 
+import '../../../app/const/app_const.dart';
 import '../../../app/global/widgets/attach_window_item.dart';
 import '../../../app/global/widgets/bacgroung_image_widget.dart';
 import '../../../app/global/widgets/input_single_chat.dart';
@@ -28,15 +42,84 @@ class _SingleChatPageState extends State<SingleChatPage> {
   bool _isDisplaySendButton = false;
   bool _isShowAttachWindow = false;
 
+  FlutterSoundRecorder? _soundRecorder;
+  bool _isRecording = false;
+  bool _isRecordInit = false;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     // TODO: implement initState
+    _soundRecorder = FlutterSoundRecorder();
+    _openAudioRecording();
     BlocProvider.of<MessageCubit>(context).getMessages(
         message: MessageEntity(
       senderUid: widget.message.senderUid,
       recipientUid: widget.message.recipientUid,
     ));
     super.initState();
+  }
+
+  Future<void> _scrollToBottom() async {
+    if (_scrollController.hasClients) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  Future<void> _openAudioRecording() async {
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Mic permission not allowed!');
+    }
+    await _soundRecorder!.openRecorder();
+    _isRecordInit = true;
+  }
+
+  File? _image;
+
+  Future selectImage() async {
+    setState(() => _image = null);
+
+    try {
+      final pickedFile =
+          await ImagePicker.platform.getImage(source: ImageSource.gallery);
+
+      setState(() {
+        if (pickedFile != null) {
+          _image = File(pickedFile.path);
+        } else {
+          debugPrint("NO IMAGE HAS BEEN SELECTED");
+        }
+      });
+    } catch (e) {
+      toast("SOME ERROR OCCUR SEE $e");
+    }
+  }
+
+  File? _video;
+
+  Future selectVideo() async {
+    setState(() => _image = null);
+
+    try {
+      final pickedFile =
+          await ImagePicker.platform.pickVideo(source: ImageSource.gallery);
+
+      setState(() {
+        if (pickedFile != null) {
+          _video = File(pickedFile.path);
+        } else {
+          debugPrint("NO VIDEO HAS BEEN SELECTED");
+        }
+      });
+    } catch (e) {
+      toast("SOME ERROR OCCUR SEE $e");
+    }
   }
 
   @override
@@ -48,6 +131,9 @@ class _SingleChatPageState extends State<SingleChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 80,
@@ -110,6 +196,9 @@ class _SingleChatPageState extends State<SingleChatPage> {
       ),
       body: BlocBuilder<MessageCubit, MessageState>(builder: (context, state) {
         if (state is MessageLoaded) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollToBottom();
+          });
           final messages = state.messages;
           return GestureDetector(
             onTap: () {
@@ -122,14 +211,17 @@ class _SingleChatPageState extends State<SingleChatPage> {
                 const BackgroundImageWidget(),
                 Column(
                   children: [
+                    //TODO 4418
                     Expanded(
                       child: ListView.builder(
+                        controller: _scrollController,
                         itemCount: messages.length,
                         itemBuilder: (context, index) {
                           final message = messages[index];
 
                           if (message.senderUid == widget.message.senderUid) {
                             return MessageLayout(
+                              messageType: message.messageType,
                               message: message.message,
                               alignment: Alignment.centerRight,
                               createAt: message.createAt,
@@ -141,6 +233,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
                             );
                           } else {
                             return MessageLayout(
+                              messageType: message.messageType,
                               message: message.message,
                               alignment: Alignment.centerLeft,
                               createAt: message.createAt,
@@ -155,8 +248,24 @@ class _SingleChatPageState extends State<SingleChatPage> {
                       ),
                     ),
                     InputSingleChat(
-                      onSendMessage: (){
-                        _sendMessage();
+                      onSendMessage: () {
+                        //_sendMessage();
+                        _sendTextMessage();
+                      },
+                      onCameraClicked: () {
+                        selectImage().then((value) {
+                          if (_image != null) {
+                            WidgetsBinding.instance
+                                .addPostFrameCallback((timestamp) {
+                              showImagePickedBottomModalSheet(context,
+                                  recipientName: widget.message.recipientName,
+                                  file: _image, onTap: () {
+                                _sendImageMessage();
+                                Navigator.pop(context);
+                              });
+                            });
+                          }
+                        });
                       },
                       onTap: () {
                         setState(() {
@@ -165,6 +274,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
                       },
                       textMessageController: _textMessageController,
                       isDisplaySendButton: _isDisplaySendButton,
+                      isRecording: _isRecording,
                       onChanged: (value) {
                         if (value.isNotEmpty) {
                           setState(() {
@@ -187,7 +297,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
                 _isShowAttachWindow == true
                     ? Positioned(
                         bottom: 65,
-                        top: 340,
+                        top: 320,
                         left: 15,
                         right: 15,
                         child: Container(
@@ -270,13 +380,35 @@ class _SingleChatPageState extends State<SingleChatPage> {
                                     icon: Icons.gif_box_outlined,
                                     color: Colors.indigoAccent,
                                     title: "Gif",
-                                    onTap: () {},
+                                    onTap: () {
+                                      _sendGifMessage();
+                                    },
                                   ),
                                   AttachWindowItem(
                                     icon: Icons.videocam,
                                     color: Colors.lightGreen,
                                     title: "Video",
-                                    onTap: () {},
+                                    onTap: () {
+                                      selectVideo().then((value) {
+                                        if (_video != null) {
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback(
+                                                  (timestamp) {
+                                            showVideoPickedBottomModalSheet(
+                                                context,
+                                                recipientName: widget
+                                                    .message.recipientName,
+                                                file: _video, onTap: () {
+                                              _sendVideoMessage();
+                                              Navigator.pop(context);
+                                            });
+                                          });
+                                        }
+                                      });
+                                      setState(() {
+                                        _isShowAttachWindow = false;
+                                      });
+                                    },
                                   ),
                                 ],
                               ),
@@ -298,35 +430,108 @@ class _SingleChatPageState extends State<SingleChatPage> {
     );
   }
 
-  void _sendMessage() {
-    BlocProvider.of<MessageCubit>(context).sendMessage(
-      chat: ChatEntity(
-        senderUid: widget.message.senderUid,
-        recipientUid: widget.message.recipientUid,
-        senderName: widget.message.senderName,
-        recipientName: widget.message.recipientName,
-        senderProfile: widget.message.senderProfile,
-        recipientProfile: widget.message.recipientProfile,
-        createAt: Timestamp.now(),
-        totalUnReadMessages: 0,
-      ),
-      message: MessageEntity(
-        senderUid: widget.message.senderUid,
-        recipientUid: widget.message.recipientUid,
-        senderName: widget.message.senderName,
-        recipientName: widget.message.recipientName,
-        messageType: MessageTypeConst.textMessage,
-        repliedTo: "",
-        repliedMessageType: "",
-        repliedMessage: "",
-        isSeen: false,
-        createAt: Timestamp.now(),
+  _sendTextMessage() async {
+    if (_isDisplaySendButton) {
+      _sendMessage(
         message: _textMessageController.text,
-      ),
-    ).then((value) => {
+        type: MessageTypeConst.textMessage,
+      );
+    } else {
+      final temporaryDir = await getTemporaryDirectory();
+      final audioPath = '${temporaryDir.path}/flutter_sound.acc';
+      if (!_isRecordInit) {
+        return;
+      }
+      if (_isRecording == true) {
+        await _soundRecorder!.stopRecorder();
+        StorageProviderRemoteDataSource.uploadMessageFile(
+          file: File(audioPath),
+          onComplete: (value) {},
+          uid: widget.message.senderUid,
+          otherUid: widget.message.recipientUid,
+          type: MessageTypeConst.audioMessage,
+        ).then((audioUrl) {
+          _sendMessage(
+            message: audioUrl,
+            type: MessageTypeConst.audioMessage,
+          );
+        });
+      } else {
+        await _soundRecorder!.startRecorder(
+          toFile: audioPath,
+        );
+      }
+
       setState(() {
-        _textMessageController.clear();
-      }),
+        _isRecording = !_isRecording;
+      });
+    }
+  }
+
+  void _sendImageMessage() {
+    StorageProviderRemoteDataSource.uploadMessageFile(
+      file: _image!,
+      onComplete: (value) {},
+      uid: widget.message.senderUid,
+      otherUid: widget.message.recipientUid,
+      type: MessageTypeConst.photoMessage,
+    ).then((photoImage) {
+      _sendMessage(
+        message: photoImage,
+        type: MessageTypeConst.photoMessage,
+      );
     });
+  }
+
+  void _sendVideoMessage() {
+    StorageProviderRemoteDataSource.uploadMessageFile(
+      file: _video!,
+      onComplete: (value) {},
+      uid: widget.message.senderUid,
+      otherUid: widget.message.recipientUid,
+      type: MessageTypeConst.videoMessage,
+    ).then((videoUrl) {
+      _sendMessage(
+        message: videoUrl,
+        type: MessageTypeConst.videoMessage,
+      );
+    });
+  }
+
+  Future _sendGifMessage() async {
+    final gif = await pickGIF(context);
+    if (gif != null) {
+      String fixedUrl = "https://media.giphy.com/media/${gif.id}/giphy.gif";
+      _sendMessage(
+        message: fixedUrl,
+        type: MessageTypeConst.gifMessage,
+      );
+    }
+  }
+
+  void _sendMessage({
+    required String message,
+    required String type,
+    String? repliedMessage,
+    String? repliedTo,
+    String? repliedMessageType,
+  }) {
+    _scrollToBottom();
+
+    ChatUtils.sendMessage(
+      context,
+      messageEntity: widget.message,
+      message: message,
+      type: type,
+      repliedTo: repliedTo,
+      repliedMessageType: repliedMessageType,
+      repliedMessage: repliedMessage,
+    ).then((value) => {
+          setState(() {
+            _textMessageController.clear();
+          }),
+        });
+
+    _scrollToBottom();
   }
 }
