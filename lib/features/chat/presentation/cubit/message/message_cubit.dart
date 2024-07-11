@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:whatsapp/features/chat/domain/entities/chat_entity.dart';
 import 'package:whatsapp/features/chat/domain/entities/message_entity.dart';
+import 'package:whatsapp/features/chat/domain/entities/message_reply_entity.dart';
 import 'package:whatsapp/features/chat/domain/usecases/get_messages_usecase.dart';
 
 import '../../../domain/usecases/delete_message_usecase.dart';
@@ -56,4 +57,13 @@ class MessageCubit extends Cubit<MessageState> {
       emit(MessageFailure());
     }
   }
+
+  MessageReplyEntity messageReplay = MessageReplyEntity();
+
+  MessageReplyEntity get getMessageReply => MessageReplyEntity();
+
+  set setMessageReplay(MessageReplyEntity messageReply) {
+    this.messageReplay = messageReplay;
+  }
+
 }

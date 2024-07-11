@@ -11,10 +11,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:whatsapp/features/app/const/message_type_const.dart';
+import 'package:whatsapp/features/app/global/widgets/dialog_widget.dart';
 import 'package:whatsapp/features/app/global/widgets/show_image_picked_widget.dart';
 import 'package:whatsapp/features/app/global/widgets/show_video_picked_widget.dart';
 import 'package:whatsapp/features/chat/domain/entities/chat_entity.dart';
 import 'package:whatsapp/features/chat/domain/entities/message_entity.dart';
+import 'package:whatsapp/features/chat/domain/entities/message_reply_entity.dart';
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_cubit.dart';
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_state.dart';
 import 'package:whatsapp/features/chat/presentation/widget/chat_utils.dart';
@@ -122,6 +124,17 @@ class _SingleChatPageState extends State<SingleChatPage> {
     }
   }
 
+  void onMessageSwipe(
+      {String? message, String? username, String? type, bool? isMe}) {
+    BlocProvider.of<MessageCubit>(context).setMessageReplay =
+        MessageReplyEntity(
+      message: message,
+      username: username,
+      messageType: type,
+      isMe: isMe,
+    );
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -134,6 +147,10 @@ class _SingleChatPageState extends State<SingleChatPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
+
+    final provider = BlocProvider.of<MessageCubit>(context);
+    final _isReplying = provider.messageReplay.message != null;
+
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 80,
@@ -228,8 +245,33 @@ class _SingleChatPageState extends State<SingleChatPage> {
                               isSeen: false,
                               isShowTick: true,
                               messageColor: senderMessageColor,
-                              onLongPress: () {},
-                              //onSwipe: (){},
+                              onLongPress: () {
+                                displayAlertDialog(
+                                  context,
+                                  onTap: () {
+                                    BlocProvider.of<MessageCubit>(context)
+                                        .deleteMessage(
+                                            message: MessageEntity(
+                                      senderUid: widget.message.senderUid,
+                                      recipientUid: widget.message.recipientUid,
+                                      messageId: message.messageId,
+                                    ));
+                                    Navigator.pop(context);
+                                  },
+                                  confirmTitle: "Delete",
+                                  content:
+                                      "Are you sure you want to delete this message ?",
+                                );
+                              },
+                              onSwipe: (value) {
+                                onMessageSwipe(
+                                  message: message.message,
+                                  username: message.senderName,
+                                  type: message.messageType,
+                                  isMe: true,
+                                );
+                                setState(() {});
+                              },
                             );
                           } else {
                             return MessageLayout(
@@ -240,13 +282,66 @@ class _SingleChatPageState extends State<SingleChatPage> {
                               isSeen: false,
                               isShowTick: false,
                               messageColor: messageColor,
-                              onLongPress: () {},
-                              //onSwipe: (){},
+                              onLongPress: () {
+                                displayAlertDialog(
+                                  context,
+                                  onTap: () {
+                                    BlocProvider.of<MessageCubit>(context)
+                                        .deleteMessage(
+                                            message: MessageEntity(
+                                      senderUid: widget.message.senderUid,
+                                      recipientUid: widget.message.recipientUid,
+                                      messageId: message.messageId,
+                                    ));
+                                    Navigator.pop(context);
+                                  },
+                                  confirmTitle: "Delete",
+                                  content:
+                                      "Are you sure you want to delete this message ?",
+                                );
+                              },
+                              onSwipe: (value) {
+                                onMessageSwipe(
+                                  message: message.message,
+                                  username: message.senderName,
+                                  type: message.messageType,
+                                  isMe: true,
+                                );
+                                setState(() {});
+                              },
                             );
                           }
                         },
                       ),
                     ),
+
+                    _isReplying == true
+                        ? SizedBox(
+                            height: 5,
+                          )
+                        : SizedBox(
+                            height: 0,
+                          ),
+
+                    _isReplying == true
+                        ? Row(
+                            children: [
+                              Expanded(
+                                child: MessageReplyPreviewWidget(
+                                  onCancelReplyListener: () {
+                                    provider.setMessageReplay =
+                                        MessageReplyEntity();
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                              Container(
+                                width: 60,
+                              ),
+                            ],
+                          )
+                        : Container(),
+
                     InputSingleChat(
                       onSendMessage: () {
                         //_sendMessage();

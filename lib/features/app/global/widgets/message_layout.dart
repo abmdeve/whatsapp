@@ -15,6 +15,7 @@ class MessageLayout extends StatelessWidget {
   //final DateTime? createAt;
   final Timestamp? createAt;
   final Function(DragUpdateDetails)? onSwipe;
+  //final VoidCallback? onSwipe;
 
   //final double? rightPadding;
   final String? message;
