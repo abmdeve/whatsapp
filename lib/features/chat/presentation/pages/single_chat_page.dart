@@ -20,6 +20,8 @@ import 'package:whatsapp/features/chat/domain/entities/message_reply_entity.dart
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_cubit.dart';
 import 'package:whatsapp/features/chat/presentation/cubit/message/message_state.dart';
 import 'package:whatsapp/features/chat/presentation/widget/chat_utils.dart';
+import 'package:whatsapp/features/chat/presentation/widget/message_widget/message_replay_preview_widget.dart';
+import 'package:whatsapp/features/chat/presentation/widget/message_widget/message_replay_type_widget.dart';
 import 'package:whatsapp/storage/storage_provider.dart';
 
 import '../../../app/const/app_const.dart';
@@ -56,9 +58,9 @@ class _SingleChatPageState extends State<SingleChatPage> {
     _openAudioRecording();
     BlocProvider.of<MessageCubit>(context).getMessages(
         message: MessageEntity(
-      senderUid: widget.message.senderUid,
-      recipientUid: widget.message.recipientUid,
-    ));
+          senderUid: widget.message.senderUid,
+          recipientUid: widget.message.recipientUid,
+        ));
     super.initState();
   }
 
@@ -89,7 +91,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
 
     try {
       final pickedFile =
-          await ImagePicker.platform.getImage(source: ImageSource.gallery);
+      await ImagePicker.platform.getImage(source: ImageSource.gallery);
 
       setState(() {
         if (pickedFile != null) {
@@ -110,7 +112,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
 
     try {
       final pickedFile =
-          await ImagePicker.platform.pickVideo(source: ImageSource.gallery);
+      await ImagePicker.platform.pickVideo(source: ImageSource.gallery);
 
       setState(() {
         if (pickedFile != null) {
@@ -126,13 +128,15 @@ class _SingleChatPageState extends State<SingleChatPage> {
 
   void onMessageSwipe(
       {String? message, String? username, String? type, bool? isMe}) {
-    BlocProvider.of<MessageCubit>(context).setMessageReplay =
+    BlocProvider
+        .of<MessageCubit>(context)
+        .setMessageReplay =
         MessageReplyEntity(
-      message: message,
-      username: username,
-      messageType: type,
-      isMe: isMe,
-    );
+          message: message,
+          username: username,
+          messageType: type,
+          isMe: isMe,
+        );
   }
 
   @override
@@ -245,22 +249,30 @@ class _SingleChatPageState extends State<SingleChatPage> {
                               isSeen: false,
                               isShowTick: true,
                               messageColor: senderMessageColor,
+                              rightPadding: message.repliedMessage == "" ? 85 : 5,
+                              reply: MessageReplyEntity(
+                                message: message.repliedMessage,
+                                messageType: message.repliedMessageType,
+                                username: message.repliedTo,
+                              ),
+                              recipientName: widget.message.recipientName,
                               onLongPress: () {
                                 displayAlertDialog(
                                   context,
                                   onTap: () {
                                     BlocProvider.of<MessageCubit>(context)
                                         .deleteMessage(
-                                            message: MessageEntity(
-                                      senderUid: widget.message.senderUid,
-                                      recipientUid: widget.message.recipientUid,
-                                      messageId: message.messageId,
-                                    ));
+                                        message: MessageEntity(
+                                          senderUid: widget.message.senderUid,
+                                          recipientUid: widget.message
+                                              .recipientUid,
+                                          messageId: message.messageId,
+                                        ));
                                     Navigator.pop(context);
                                   },
                                   confirmTitle: "Delete",
                                   content:
-                                      "Are you sure you want to delete this message ?",
+                                  "Are you sure you want to delete this message ?",
                                 );
                               },
                               onSwipe: (value) {
@@ -282,22 +294,30 @@ class _SingleChatPageState extends State<SingleChatPage> {
                               isSeen: false,
                               isShowTick: false,
                               messageColor: messageColor,
+                              rightPadding: message.repliedMessage == "" ? 85 : 5,
+                              recipientName: widget.message.recipientName,
+                              reply: MessageReplyEntity(
+                                message: message.repliedMessage,
+                                messageType: message.repliedMessageType,
+                                username: message.repliedTo,
+                              ),
                               onLongPress: () {
                                 displayAlertDialog(
                                   context,
                                   onTap: () {
                                     BlocProvider.of<MessageCubit>(context)
                                         .deleteMessage(
-                                            message: MessageEntity(
-                                      senderUid: widget.message.senderUid,
-                                      recipientUid: widget.message.recipientUid,
-                                      messageId: message.messageId,
-                                    ));
+                                        message: MessageEntity(
+                                          senderUid: widget.message.senderUid,
+                                          recipientUid: widget.message
+                                              .recipientUid,
+                                          messageId: message.messageId,
+                                        ));
                                     Navigator.pop(context);
                                   },
                                   confirmTitle: "Delete",
                                   content:
-                                      "Are you sure you want to delete this message ?",
+                                  "Are you sure you want to delete this message ?",
                                 );
                               },
                               onSwipe: (value) {
@@ -317,29 +337,29 @@ class _SingleChatPageState extends State<SingleChatPage> {
 
                     _isReplying == true
                         ? SizedBox(
-                            height: 5,
-                          )
+                      height: 5,
+                    )
                         : SizedBox(
-                            height: 0,
-                          ),
+                      height: 0,
+                    ),
 
                     _isReplying == true
                         ? Row(
-                            children: [
-                              Expanded(
-                                child: MessageReplyPreviewWidget(
-                                  onCancelReplyListener: () {
-                                    provider.setMessageReplay =
-                                        MessageReplyEntity();
-                                    setState(() {});
-                                  },
-                                ),
-                              ),
-                              Container(
-                                width: 60,
-                              ),
-                            ],
-                          )
+                      children: [
+                        Expanded(
+                          child: MessageReplayPreviewWidget(
+                            onCancelReplayListener: () {
+                              provider.setMessageReplay =
+                                  MessageReplyEntity();
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: 60,
+                        ),
+                      ],
+                    )
                         : Container(),
 
                     InputSingleChat(
@@ -355,9 +375,9 @@ class _SingleChatPageState extends State<SingleChatPage> {
                               showImagePickedBottomModalSheet(context,
                                   recipientName: widget.message.recipientName,
                                   file: _image, onTap: () {
-                                _sendImageMessage();
-                                Navigator.pop(context);
-                              });
+                                    _sendImageMessage();
+                                    Navigator.pop(context);
+                                  });
                             });
                           }
                         });
@@ -370,6 +390,7 @@ class _SingleChatPageState extends State<SingleChatPage> {
                       textMessageController: _textMessageController,
                       isDisplaySendButton: _isDisplaySendButton,
                       isRecording: _isRecording,
+                      isReplaying: _isReplying,
                       onChanged: (value) {
                         if (value.isNotEmpty) {
                           setState(() {
@@ -391,126 +412,129 @@ class _SingleChatPageState extends State<SingleChatPage> {
                 ),
                 _isShowAttachWindow == true
                     ? Positioned(
-                        bottom: 65,
-                        top: 320,
-                        left: 15,
-                        right: 15,
-                        child: Container(
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.width * 0.20,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 20),
-                          decoration: BoxDecoration(
-                            //color: Colors.grey,
-                            color: bottomAttachContainerColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  AttachWindowItem(
-                                    icon: Icons.document_scanner,
-                                    color: Colors.deepPurpleAccent,
-                                    title: "Document",
-                                    onTap: () {},
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.camera_alt,
-                                    color: Colors.pinkAccent,
-                                    title: "Camera",
-                                    onTap: () {},
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.image,
-                                    color: Colors.purpleAccent,
-                                    title: "Gallery",
-                                    onTap: () {},
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  AttachWindowItem(
-                                    icon: Icons.headphones,
-                                    color: Colors.deepOrange,
-                                    title: "Audio",
-                                    onTap: () {},
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.location_on,
-                                    color: Colors.green,
-                                    title: "Location",
-                                    onTap: () {},
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.account_circle,
-                                    color: Colors.deepPurpleAccent,
-                                    title: "Contacts",
-                                    onTap: () {},
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  AttachWindowItem(
-                                    icon: Icons.bar_chart,
-                                    color: tabColor,
-                                    title: "Poll",
-                                    onTap: () {},
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.gif_box_outlined,
-                                    color: Colors.indigoAccent,
-                                    title: "Gif",
-                                    onTap: () {
-                                      _sendGifMessage();
-                                    },
-                                  ),
-                                  AttachWindowItem(
-                                    icon: Icons.videocam,
-                                    color: Colors.lightGreen,
-                                    title: "Video",
-                                    onTap: () {
-                                      selectVideo().then((value) {
-                                        if (_video != null) {
-                                          WidgetsBinding.instance
-                                              .addPostFrameCallback(
-                                                  (timestamp) {
-                                            showVideoPickedBottomModalSheet(
-                                                context,
-                                                recipientName: widget
-                                                    .message.recipientName,
-                                                file: _video, onTap: () {
-                                              _sendVideoMessage();
-                                              Navigator.pop(context);
-                                            });
-                                          });
-                                        }
-                                      });
-                                      setState(() {
-                                        _isShowAttachWindow = false;
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                  bottom: 65,
+                  top: 320,
+                  left: 15,
+                  right: 15,
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.20,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 5, vertical: 20),
+                    decoration: BoxDecoration(
+                      //color: Colors.grey,
+                      color: bottomAttachContainerColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceEvenly,
+                          children: [
+                            AttachWindowItem(
+                              icon: Icons.document_scanner,
+                              color: Colors.deepPurpleAccent,
+                              title: "Document",
+                              onTap: () {},
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.camera_alt,
+                              color: Colors.pinkAccent,
+                              title: "Camera",
+                              onTap: () {},
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.image,
+                              color: Colors.purpleAccent,
+                              title: "Gallery",
+                              onTap: () {},
+                            ),
+                          ],
                         ),
-                      )
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceEvenly,
+                          children: [
+                            AttachWindowItem(
+                              icon: Icons.headphones,
+                              color: Colors.deepOrange,
+                              title: "Audio",
+                              onTap: () {},
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.location_on,
+                              color: Colors.green,
+                              title: "Location",
+                              onTap: () {},
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.account_circle,
+                              color: Colors.deepPurpleAccent,
+                              title: "Contacts",
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceEvenly,
+                          children: [
+                            AttachWindowItem(
+                              icon: Icons.bar_chart,
+                              color: tabColor,
+                              title: "Poll",
+                              onTap: () {},
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.gif_box_outlined,
+                              color: Colors.indigoAccent,
+                              title: "Gif",
+                              onTap: () {
+                                _sendGifMessage();
+                              },
+                            ),
+                            AttachWindowItem(
+                              icon: Icons.videocam,
+                              color: Colors.lightGreen,
+                              title: "Video",
+                              onTap: () {
+                                selectVideo().then((value) {
+                                  if (_video != null) {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback(
+                                            (timestamp) {
+                                          showVideoPickedBottomModalSheet(
+                                              context,
+                                              recipientName: widget
+                                                  .message.recipientName,
+                                              file: _video, onTap: () {
+                                            _sendVideoMessage();
+                                            Navigator.pop(context);
+                                          });
+                                        });
+                                  }
+                                });
+                                setState(() {
+                                  _isShowAttachWindow = false;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
                     : Container(),
               ],
             ),
@@ -526,11 +550,31 @@ class _SingleChatPageState extends State<SingleChatPage> {
   }
 
   _sendTextMessage() async {
+    final provider = BlocProvider.of<MessageCubit>(context);
     if (_isDisplaySendButton) {
-      _sendMessage(
+      /*_sendMessage(
         message: _textMessageController.text,
         type: MessageTypeConst.textMessage,
-      );
+      );*/
+      if (provider.messageReplay.message != null) {
+        _sendMessage(
+          message: _textMessageController.text,
+          type: MessageTypeConst.textMessage,
+          repliedMessage: provider.messageReplay.message,
+          repliedTo: provider.messageReplay.username,
+          repliedMessageType: provider.messageReplay.messageType,
+        );
+      } else {
+        _sendMessage(
+          message: _textMessageController.text,
+          type: MessageTypeConst.textMessage,
+        );
+      }
+
+      provider.setMessageReplay = MessageReplyEntity();
+      setState(() {
+        _textMessageController.clear();
+      });
     } else {
       final temporaryDir = await getTemporaryDirectory();
       final audioPath = '${temporaryDir.path}/flutter_sound.acc';
@@ -621,12 +665,12 @@ class _SingleChatPageState extends State<SingleChatPage> {
       repliedTo: repliedTo,
       repliedMessageType: repliedMessageType,
       repliedMessage: repliedMessage,
-    ).then((value) => {
-          setState(() {
+    ).then((value) =>
+    {
+      /*setState(() {
             _textMessageController.clear();
-          }),
-        });
-
-    _scrollToBottom();
+          }),*/
+      _scrollToBottom(),
+    });
   }
 }

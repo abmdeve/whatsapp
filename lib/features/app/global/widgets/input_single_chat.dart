@@ -6,6 +6,7 @@ class InputSingleChat extends StatelessWidget {
   final TextEditingController textMessageController;
   final bool isDisplaySendButton;
   final bool isRecording;
+  final bool isReplaying;
   final Function(String) onChanged;
   final VoidCallback? onAttachedFileClicked;
   final VoidCallback? onCameraClicked;
@@ -18,6 +19,7 @@ class InputSingleChat extends StatelessWidget {
     required this.textMessageController,
     required this.isDisplaySendButton,
     required this.isRecording,
+    required this.isReplaying,
     required this.onChanged,
     this.onAttachedFileClicked,
     this.onCameraClicked,
@@ -29,21 +31,22 @@ class InputSingleChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      margin: EdgeInsets.only(
+          left: 10, right: 10, top: isReplaying == true ? 0 : 5, bottom: 5),
       child: Row(
         children: [
           //TODO INPUT EMOJI ATTACH_FILE PHOTO
           Expanded(
             child: Container(
-              padding: const EdgeInsets.only(
-                left: 10,
-                right: 10,
-                top: 5,
-                bottom: 5,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 color: appBarColor,
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: isReplaying == true
+                    ? BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
+                      )
+                    : BorderRadius.circular(25),
               ),
               height: 50,
               child: TextField(

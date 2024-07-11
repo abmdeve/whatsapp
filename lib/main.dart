@@ -20,7 +20,7 @@ import 'main_injection_container.dart' as di;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    name: "whatsapp-c2cd8",
+    //name: "whatsapp-c2cd8",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await di.init();
